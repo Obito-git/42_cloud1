@@ -12,17 +12,8 @@ wp	core download --allow-root --path="/var/www/html"
 rm	-f /var/www/html/wp-config.php
 cp	./wp-config.php /var/www/html/wp-config.php
 
+sleep 5
 
-while true; do
-    result=$(mysql -u root -p"DB_ROOT_PASSWORD" -h "$DB_HOST" -e \
-    "SHOW DATABASES LIKE '$DB_DATABASE_NAME';" | grep -q "$DB_DATABASE_NAME" && echo 1 || echo 0)
-
-    if [ "$result" -eq 0 ]; then
-        break
-    else
-        sleep 2
-    fi
-done
 
 #admin
 wp	core install \
@@ -42,5 +33,7 @@ wp	user create \
 		${WORDPRESS_EMAIL} \
 		--role=author \
 		--user_pass=${WORDPRESS_PASSWORD}
+
+wp --allow-root theme activate twentytwentyone --path="/var/www/html"
 
 exec	php-fpm7 -F -R
