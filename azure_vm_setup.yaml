@@ -27,8 +27,6 @@
    azure.azcollection.azure_rm_subnet:
      resource_group: "{{ az_group_name }}"
      name: subnet001
-     dns_settings:
-          domain_name_label: exampledns4308
      address_prefix: "10.10.0.0/24"
      virtual_network: testvn001
 
@@ -49,6 +47,12 @@
          access: Allow
          priority: 101
          direction: Inbound
+       - name: HTTPS
+         protocol: "*"
+         destination_port_range: 443
+         access: Allow
+         priority: 310
+         direction: Inbound
 
  - name: Create NIC
    azure.azcollection.azure_rm_networkinterface:
@@ -63,7 +67,7 @@
    azure.azcollection.azure_rm_virtualmachine:
      resource_group: "{{ az_group_name }}"
      name: testvm001
-     vm_size: Standard_B1s
+     vm_size: Standard_B2s
      managed_disk_type: Standard_LRS
      storage_account: testaccount001911
      storage_container: testvm001
