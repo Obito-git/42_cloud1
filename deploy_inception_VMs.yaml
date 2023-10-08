@@ -1,11 +1,11 @@
 ---
-- name: Deploy inception VMs
-  hosts: localhost
-  gather_facts: false
-  vars:
-     default_az_group_name: default_inception_group
-  tasks:
-      - include_tasks: azure_vm_setup.yaml
-        vars:
-            az_group_name: "{{ default_az_group_name }}"
+ - name: Deploy inception VMs
+   hosts: localhost
+   gather_facts: false
+   vars:
+      default_az_group_name: default_inception_group
+   tasks:
+       - include_tasks: azure_vm_setup.yaml
+         vars:
+             az_group_name: "{{ default_az_group_name }}"
 

@@ -1,85 +1,82 @@
 ---
-- name: Create Azure Resource Group if not exists
-  hosts: localhost
-  tasks:
-    - name: Create Azure Resource Group
-      azure_rm_resourcegroup:
-        name: "{{ az_group_name }}"
-        location: francecentral
-        state: present
-      register: rg_result
+ - name: Create Azure Resource Group
+   azure_rm_resourcegroup:
+     name: "{{ az_group_name }}"
+     location: francecentral
+     state: present
+   register: rg_result
 
-    - name: Display the result
-      debug:
-        var: rg_result
+ - name: Display the result
+   debug:
+     var: rg_result
 
-- name: create resources to build a VM
-  hosts: localhost
-  tasks:
+     #- name: Create storage account if it doesn't exist
+     #azure.azcollection.azure_rm_storageaccount:
+     #resource_group: "{{ az_group_name }}"
+     #name: testaccount001911
+     #account_type: Standard_LRS
+     #state: present
 
-  - name: Create storage account
-    azure.azcollection.azure_rm_storageaccount:
-      resource_group: "{{ az_group_name }}"
-      name: testaccount001911
-      account_type: Standard_LRS
+ - name: Create virtual network
+   azure.azcollection.azure_rm_virtualnetwork:
+     resource_group: "{{ az_group_name }}"
+     name: testvn001
+     address_prefixes: "10.10.0.0/16"
 
-  - name: Create virtual network
-    azure.azcollection.azure_rm_virtualnetwork:
-      resource_group: "{{ az_group_name }}"
-      name: testvn001
-      address_prefixes: "10.10.0.0/16"
+ - name: Add subnet
+   azure.azcollection.azure_rm_subnet:
+     resource_group: "{{ az_group_name }}"
+     name: subnet001
+     dns_settings:
+          domain_name_label: exampledns4308
+     address_prefix: "10.10.0.0/24"
+     virtual_network: testvn001
 
-  - name: Add subnet
-    azure.azcollection.azure_rm_subnet:
-      resource_group: "{{ az_group_name }}"
-      name: subnet001
-      address_prefix: "10.10.0.0/24"
-      virtual_network: testvn001
+ - name: Create public ip
+   azure.azcollection.azure_rm_publicipaddress:
+     resource_group: "{{ az_group_name }}"
+     allocation_method: Static
+     name: publicip001
 
-  - name: Create public ip
-    azure.azcollection.azure_rm_publicipaddress:
-      resource_group: "{{ az_group_name }}"
-      allocation_method: Static
-      name: publicip001
+ - name: Create security group that allows SSH
+   azure.azcollection.azure_rm_securitygroup:
+     resource_group: "{{ az_group_name }}"
+     name: secgroup001
+     rules:
+       - name: SSH
+         protocol: Tcp
+         destination_port_range: 22
+         access: Allow
+         priority: 101
+         direction: Inbound
 
-  - name: Create security group that allows SSH
-    azure.azcollection.azure_rm_securitygroup:
-      resource_group: "{{ az_group_name }}"
-      name: secgroup001
-      rules:
-        - name: SSH
-          protocol: Tcp
-          destination_port_range: 22
-          access: Allow
-          priority: 101
-          direction: Inbound
+ - name: Create NIC
+   azure.azcollection.azure_rm_networkinterface:
+     resource_group: "{{ az_group_name }}"
+     name: testnic001
+     virtual_network: testvn001
+     subnet: subnet001
+     public_ip_name: publicip001
+     security_group: secgroup001
 
-  - name: Create NIC
-    azure.azcollection.azure_rm_networkinterface:
-      resource_group: "{{ az_group_name }}"
-      name: testnic001
-      virtual_network: testvn001
-      subnet: subnet001
-      public_ip_name: publicip001
-      security_group: secgroup001
+ - name: Create virtual machine
+   azure.azcollection.azure_rm_virtualmachine:
+     resource_group: "{{ az_group_name }}"
+     name: testvm001
+     vm_size: Standard_B1s
+     managed_disk_type: Standard_LRS
+     storage_account: testaccount001911
+     storage_container: testvm001
+     storage_blob: testvm001.vhd
+     admin_username: hello
+     admin_password: PJ3fTwX0wxEE4yd
+     network_interfaces: testnic001
+     os_disk_size_gb: 30
+     image:
+       offer: 0001-com-ubuntu-server-focal
+       publisher: Canonical
+       sku: '20_04-lts-gen2'
+       version: 20.04.202308310
 
-  - name: Create virtual machine
-    azure.azcollection.azure_rm_virtualmachine:
-      resource_group: "{{ az_group_name }}"
-      name: testvm001
-      vm_size: Standard_B1s
-      managed_disk_type: Standard_LRS
-      storage_account: testaccount001911
-      storage_container: testvm001
-      storage_blob: testvm001.vhd
-      admin_username: hello
-      admin_password: PJ3fTwX0wxEE4yd
-      network_interfaces: testnic001
-      os_disk_size_gb: 30
-      image:
-        offer: 0001-com-ubuntu-server-focal
-        publisher: Canonical
-        sku: '20_04-lts-gen2'
-        version: 20.04.202308310
 
 
