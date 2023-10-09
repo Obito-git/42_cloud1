@@ -1,0 +1,47 @@
+- hosts: localhost
+  become: yes 
+
+  vars:
+    docker_compose_version: "{{ lookup('url', 'https://api.github.com/repos/docker/compose/releases/latest') | from_json | json_query('tag_name') }}"
+
+  tasks:
+    - name: Add Docker GPG key
+      apt_key: url=https://download.docker.com/linux/ubuntu/gpg
+
+    - name: Add Docker APT repository
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ansible_distribution_release}} stable
+
+    - name: Install list of packages
+      apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: yes
+      loop: [apt-transport-https, ca-certificates, curl, software-properties-common, docker-ce, docker-ce-cli, containerd.io, docker-compose-plugin, make]
+
+    - name: Add user to docker group  
+      ansible.builtin.user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
+
+    - name: Download docker-compose
+      ansible.builtin.get_url:
+        url: "https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-{{ ansible_system }}-{{ ansible_architecture }}"
+        dest: /usr/local/bin/docker-compose
+        mode: '0755'
+
+    - name: Copy Inception .env file
+      ansible.builtin.copy:
+        src: ".env.sample"
+        dest: ".env"
+
+    - name: Set WORDPRESS_HOST in .env
+      ansible.builtin.lineinfile:
+        path: ".env"
+        regexp: '^WORDPRESS_HOST='
+        line: "WORDPRESS_HOST={{ wordpress_host }}"
+
+    - name: Build inception
+      shell: make
+

@@ -10,11 +10,8 @@
     - name: SSH into the VM and run 'ls'
       ansible.builtin.shell: |
         sshpass -p "PJ3fTwX0wxEE4yd" ssh -o StrictHostKeyChecking=no hello@"{{ public_ip_result.stdout }}" '
-          rm -rf 42_cloud1 &&
           git clone https://github.com/Obito-git/42_cloud1.git &&
-          cp 42_cloud1/inception/install_dependencies.sh ./ &&
-          #launch install deps
-          cp 42_cloud1/inception/.env.sample 42_cloud1/inception/.env &&
-          echo "WORDPRESS_HOST={{ public_ip_result.stdout }}" >> 42_cloud1/inception/.env &&
-          make -C 42_cloud1/inception
+          sudo apt update &&
+          sudo apt install -y ansible &&
+          ansible-book 42_cloud1/
         '
