@@ -6,17 +6,17 @@
    tasks:
        - include_tasks: tasks/azure_vm_setup.yaml
          vars:
-             az_vm_name: "testvm1"
+             az_vm_name: "testvm346"
              az_vm_admin_username: "hello"
              az_vm_admin_password: "PJ3fTwX0wxEE4yd"
-             az_group_name: "default_az_group_name"
+             az_group_name: "default_az_group_name46"
 
-             az_nic_name: "nic1"
-             az_public_ip_name: "pubip1"
-             az_vir_network_name: "network_name1"
-             az_subnet_name: "subnet1"
-             az_storage_name: "storage1"
-             az_storage_account_name: "storageacc14242" 
-             az_security_group_name: "secgroup1"
+             az_nic_name: "nic346"
+             az_public_ip_name: "pubip346"
+             az_vir_network_name: "network_name346"
+             az_subnet_name: "subnet346"
+             az_storage_name: "storage346"
+             az_storage_account_name: "storageacc142424146"
+             az_security_group_name: "secgroup346"
 
 

@@ -87,13 +87,19 @@
      az vm show -d -g "{{ az_group_name }}" -n "{{ az_vm_name }}" --query publicIps -o tsv
    register: public_ip_result
 
+ - name: Wait for 30 seconds
+   wait_for:
+     timeout: 30
+
  - name: SSH into the VM and launch inception
    ansible.builtin.shell: |
      sshpass -p "{{ az_vm_admin_password }}" ssh -o StrictHostKeyChecking=no "{{ az_vm_admin_username }}"@"{{ public_ip_result.stdout }}" '
           git clone https://github.com/Obito-git/42_cloud1.git &&
           sudo apt update &&
           sudo apt install -y ansible &&
-          ansible-book 42_cloud1/inception/setup_inception_VM.yaml -e "wordpress_host="{{ public_ip_result.stdout }}""
+          ansible-playbook 42_cloud1/inception/setup_inception_VM.yaml -e "wordpress_host="{{ public_ip_result.stdout }}""
         '
 
-
+ - name: Print Success Message
+   debug:
+     msg: "{{ az_vm_name }} has been deployed on https://{{ public_ip_result.stdout }}"
