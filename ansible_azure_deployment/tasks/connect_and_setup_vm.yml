@@ -1,15 +1,14 @@
 ---   
- - name: "[{{ vm_name }}]: Check if Git repository exists"
+ - name: "[{{ vm_name }}]: Check inception directory"
    stat:
-     path: ~/42_cloud1
-   register: destination_stat
-   check_mode: no
+     path: ~/inception
+   register: inception_dir
 
- - name: "[{{ vm_name }}]: Clone Git repository if it doesn't exist"
-   git:
-     repo: https://github.com/Obito-git/42_cloud1.git
-     dest: ~/42_cloud1
-   when: not destination_stat.stat.exists 
+ - name: "[{{ vm_name }}]: copy inception from my server to the remote one"
+   copy:
+     src: ../inception
+     dest: ~/
+   when: not inception_dir.stat.exists
 
  - name: "[{{ vm_name }}]: Update APT repositories"
    become: yes
@@ -23,8 +22,8 @@
      state: present
 
  - name: "[{{ vm_name }}]: Run the playbook"
-   command: ansible-playbook 42_cloud1/inception/setup_inception_VM.yml -e "wordpress_host={{ public_ip }}"
+   command: ansible-playbook ~/inception/setup_inception_VM.yml -e "wordpress_host={{ public_ip }}"
 
  - name: "[{{ vm_name }}]: Print success message"
    debug:
-     msg: "Inception has been successfully run on {{ vm_name }} and available on {{ public_ip }}"
+     msg: "Inception has been successfully run on {{ vm_name }} and available on https://{{ public_ip }}"

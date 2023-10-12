@@ -24,6 +24,7 @@
         storage_name: "{{ vm1_storage_name }}"
         storage_account_name: "{{ vm1_storage_account_name }}"
         security_group_name: "{{ vm1_security_group_name }}"
+        host_name: "{{ vm1_host_name }}"
 
     - name: Deploy VM2
       include_tasks: tasks/azure_vm_setup.yml
@@ -38,4 +39,5 @@
         storage_name: "{{ vm2_storage_name }}"
         storage_account_name: "{{ vm2_storage_account_name }}"
         security_group_name: "{{ vm2_security_group_name }}"
+        host_name: "{{ vm2_host_name }}"
 

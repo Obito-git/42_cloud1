@@ -105,6 +105,8 @@
    shell: "ssh-keyscan {{ get_public_ip.stdout }}"
    register: fingerprint_output
    changed_when: false
+   retries: 30
+   until: fingerprint_output.rc == 0
 
  - name: "[{{ vm_name }}]: Add fingerprint to known_hosts"
    shell: echo "{{ fingerprint_output.stdout_lines[0] }}" >> ~/.ssh/known_hosts
@@ -113,12 +115,9 @@
    blockinfile:
      path: "{{ inventory_file_path }}"
      block: |
-       "[{{ host_name }}]
+       [{{ host_name }}]
        {{ get_public_ip.stdout }} ansible_ssh_common_args='-i ~/.ssh/{{ vm_name }}'
 
-       "
-   create: yes
+     marker: ''
+     create: yes
 
- - name: "[{{ vm_name }}]: Deploying..."
-   wait_for:
-     timeout: 15
