@@ -1,0 +1,41 @@
+---
+- name: Delete all resources
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - inv/variables.yml
+
+  tasks:
+    - name: Delete all resources in the resource group
+      azure_rm_resourcegroup:
+        name: "{{ vm1_group_name }}"
+        force_delete_nonempty: yes
+        state: absent
+      async: 600
+      poll: 0
+      register: vm1_status
+
+    - name: Delete all resources in the resource group
+      azure_rm_resourcegroup:
+        name: "{{ vm2_group_name }}"
+        force_delete_nonempty: yes
+        state: absent
+      async: 600
+      poll: 0
+      register: vm2_status
+
+    - name: Check on an async task
+      async_status:
+        jid: "{{ vm1_status.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: 100
+      delay: 10
+
+    - name: Check on an async task
+      async_status:
+        jid: "{{ vm2_status.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: 100
+      delay: 10

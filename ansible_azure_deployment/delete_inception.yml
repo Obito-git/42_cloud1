@@ -1,0 +1,19 @@
+---
+- name: Inception VMs
+  hosts: all
+  gather_facts: no
+  remote_user: "{{ common_username }}"
+  strategy: free
+  vars_files:
+    - inv/variables.yml
+
+  tasks:
+    - name: Fclean inception
+      shell: make -C ~/inception fclean
+
+    - name: Remove inception dir
+      file:
+        path: ~/inception
+        state: absent
+
+
