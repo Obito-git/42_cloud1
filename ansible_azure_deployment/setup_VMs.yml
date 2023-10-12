@@ -1,0 +1,27 @@
+---
+- name: Inception VMs
+  hosts: all
+  gather_facts: no
+  remote_user: "{{ common_username }}"
+  strategy: free
+  vars_files:
+    - inv/variables.yml
+
+  tasks:
+   - name: setup VM1
+     include_tasks: tasks/connect_and_setup_vm.yml
+     vars:
+       vm_name: "{{ vm1_name }}"
+       group_name: "{{ vm1_group_name }}"
+       public_ip: "{{ hostvars[inventory_hostname].groups[vm1_host_name][0] }}"
+     when: inventory_hostname in groups[vm1_host_name]
+
+   - name: setup VM2
+     include_tasks: tasks/connect_and_setup_vm.yml
+     vars:
+       vm_name: "{{ vm2_name }}"
+       group_name: "{{ vm2_group_name }}"
+       public_ip: "{{ hostvars[inventory_hostname].groups[vm2_host_name][0] }}"
+     when: inventory_hostname in groups[vm2_host_name]
+
+

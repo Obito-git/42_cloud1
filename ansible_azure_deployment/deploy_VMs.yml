@@ -1,0 +1,41 @@
+---
+- name: Deploy azure VMs
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - inv/variables.yml
+
+  tasks:
+    - name: Clean inventory file
+      copy:
+        content: |
+        dest: "{{ inventory_file_path }}"
+
+    - name: Deploy VM1
+      include_tasks: tasks/azure_vm_setup.yml
+      vars:
+        admin_username: "{{ common_username }}"
+        vm_name: "{{ vm1_name }}"
+        group_name: "{{ vm1_group_name }}"
+        nic_name: "{{ vm1_nic_name }}"
+        public_ip_name: "{{ vm1_public_ip_name }}"
+        vir_network_name: "{{ vm1_vir_network_name }}"
+        subnet_name: "{{ vm1_subnet_name }}"
+        storage_name: "{{ vm1_storage_name }}"
+        storage_account_name: "{{ vm1_storage_account_name }}"
+        security_group_name: "{{ vm1_security_group_name }}"
+
+    - name: Deploy VM2
+      include_tasks: tasks/azure_vm_setup.yml
+      vars:
+        admin_username: "{{ common_username }}"
+        vm_name: "{{ vm2_name }}"
+        group_name: "{{ vm2_group_name }}"
+        nic_name: "{{ vm2_nic_name }}"
+        public_ip_name: "{{ vm2_public_ip_name }}"
+        vir_network_name: "{{ vm2_vir_network_name }}"
+        subnet_name: "{{ vm2_subnet_name }}"
+        storage_name: "{{ vm2_storage_name }}"
+        storage_account_name: "{{ vm2_storage_account_name }}"
+        security_group_name: "{{ vm2_security_group_name }}"
+
